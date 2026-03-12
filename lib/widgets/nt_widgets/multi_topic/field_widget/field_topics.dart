@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:dot_cast/dot_cast.dart';
 import 'package:elastic_dashboard/services/nt4_client.dart';
 import 'package:elastic_dashboard/services/nt4_type.dart';
 import 'package:elastic_dashboard/services/nt_connection.dart';
@@ -31,6 +32,14 @@ class SubscribedTopic<T extends Object?> {
     final subValue = subscription.value;
     if (subValue is T) {
       return subValue;
+    }
+    if (subValue is List && defaultValue is List) {
+      if (defaultValue is List<double>) {
+        return subValue.map((e) => tryCast<num>(e)?.toDouble() ?? 0.0).toList() as T;
+      } else if (defaultValue is List<int>) {
+        return subValue.map((e) => tryCast<num>(e)?.toInt() ?? 0).toList() as T;
+      }
+      return subValue.cast() as T;
     }
     return defaultValue;
   }
